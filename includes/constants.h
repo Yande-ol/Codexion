@@ -8,8 +8,8 @@
 /* Políticas do escalonador (scheduler) */
 typedef enum e_scheduler
 {
-	SCHED_FIFO,
-	SCHED_EDF
+	POLICY_FIFO,
+	POLICY_EDF
 }	t_scheduler;
 
 /* Mensagens de log */
