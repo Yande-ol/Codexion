@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   structures.h                                       :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: Yande-ol <Yande-ol@student.42porto.com>    #+#  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026-09-05 13:37:37 by Yande-ol          #+#    #+#             */
+/*   Updated: 2026-09-05 13:37:37 by Yande-ol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef STRUCTURES_H
 # define STRUCTURES_H
 
@@ -21,7 +33,6 @@ typedef struct s_request
 	long long	deadline;
 }	t_request;
 
-
 typedef struct s_heap
 {
 	t_request	*requests;
@@ -29,7 +40,6 @@ typedef struct s_heap
 	int			capacity;
 	t_scheduler	policy;
 }	t_heap;
-
 
 typedef struct s_dongle
 {
@@ -40,7 +50,6 @@ typedef struct s_dongle
 	pthread_cond_t	cond;
 	t_heap			queue;
 }	t_dongle;
-
 
 typedef struct s_coder
 {
@@ -53,7 +62,6 @@ typedef struct s_coder
 	pthread_mutex_t	meal_mutex;
 	t_data			*data;
 }	t_coder;
-
 
 struct s_data
 {

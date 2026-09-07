@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   constants.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: Yande-ol <Yande-ol@student.42porto.com>    #+#  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2026-09-05 13:37:04 by Yande-ol          #+#    #+#             */
+/*   Updated: 2026-09-05 13:37:04 by Yande-ol         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef CONSTANTS_H
 # define CONSTANTS_H
 
@@ -21,4 +33,6 @@ typedef enum e_scheduler
 
 #endif
 
-/* Este arquivo guarda apenas números mágicos, textos fixos e identificadores de estado. Ele não depende de nada externo */
+/* Este arquivo guarda apenas 
+números mágicos, textos fixos e
+ identificadores de estado. Ele não depende de nada externo */
