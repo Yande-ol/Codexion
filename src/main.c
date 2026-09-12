@@ -14,12 +14,14 @@
 
 int	main(int argc, char **argv)
 {
-	(void)argv;
-	if (argc != 9)
-	{
-		write(2, "Error: Invalid number of arguments\n", 35);
+	t_data	data;
+
+	memset(&data, 0, sizeof(t_data));
+	if (parse_arguments(argc, argv, &data) != SUCCESS)
 		return (ERROR);
-	}
-	write(1, "Codexion iniciado com sucesso!\n", 31);
+	printf("Configuracao carregada com sucesso!\n");
+	printf("Coders: %d | Scheduler: %s\n",
+		data.num_coders,
+		data.scheduler_type == POLICY_FIFO ? "FIFO" : "EDF");
 	return (SUCCESS);
 }
