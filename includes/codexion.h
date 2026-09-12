@@ -23,4 +23,7 @@
 # include "constants.h"
 # include "structures.h"
 
+/*Parsing*/
+int	parse_arguments(int argc, char **argv, t_data *data);
+
 #endif
