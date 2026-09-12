@@ -9,7 +9,8 @@ OBJ_DIR     = obj
 INC_DIR     = includes
 
 # Lista de fontes
-SRCS        = $(SRC_DIR)/main.c
+SRCS        = $(SRC_DIR)/main.c \
+			$(SRC_DIR)/parsing/parse_args.c
 
 # Mapeamento de objetos e dependencias
 OBJS        = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
