@@ -23,7 +23,15 @@
 # include "constants.h"
 # include "structures.h"
 
-/*Parsing*/
-int	parse_arguments(int argc, char **argv, t_data *data);
+/* Parsing */
+int		parse_arguments(int argc, char **argv, t_data *data);
+
+/* Priority Queue (Min-Heap) */
+int		heap_init(t_heap *heap, int capacity, t_scheduler policy);
+void	heap_destroy(t_heap *heap);
+void	sift_down(t_heap *heap, int index);
+int		heap_push(t_heap *heap, t_request req);
+int		heap_pop(t_heap *heap, t_request *out_req);
+int		heap_peek(t_heap *heap, t_request *out_req);
 
 #endif
