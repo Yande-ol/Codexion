@@ -12,10 +12,6 @@
 
 #include "codexion.h"
 
-/*
-** Verifica se a string contém apenas dígitos (0-9)
-** e se não é uma string vazia.
-*/
 static int	is_numeric(const char *str)
 {
 	int	i;
@@ -32,9 +28,6 @@ static int	is_numeric(const char *str)
 	return (1);
 }
 
-/*
-** Converte string para long long positivo, tratando overflow básico.
-*/
 static long long	ft_atoll_pos(const char *str)
 {
 	long long	res;
@@ -52,9 +45,6 @@ static long long	ft_atoll_pos(const char *str)
 	return (res);
 }
 
-/*
-** Valida o oitavo argumento e define o enum correspondente.
-*/
 static int	parse_scheduler(const char *str, t_scheduler *policy)
 {
 	if (strcmp(str, "fifo") == 0)
@@ -70,26 +60,30 @@ static int	parse_scheduler(const char *str, t_scheduler *policy)
 	return (ERROR);
 }
 
-/*
-** Orquestra a validação e preenche a estrutura t_data.
-*/
+static int	validate_ranges(t_data *data)
+{
+	if (data->num_coders <= 0 || data->time_to_burnout <= 0
+		|| data->time_to_compile <= 0 || data->time_to_debug <= 0
+		|| data->time_to_refactor <= 0 || data->compiles_required < 0
+		|| data->dongle_cooldown < 0)
+	{
+		fprintf(stderr, "Error: Arguments out of valid range.\n");
+		return (ERROR);
+	}
+	return (SUCCESS);
+}
+
 int	parse_arguments(int argc, char **argv, t_data *data)
 {
 	int	i;
 
 	if (argc != 9)
-	{
-		fprintf(stderr, "Error: Invalid number of arguments.\n");
-		return (ERROR);
-	}
+		return (fprintf(stderr, "Error: Invalid number of args.\n"), ERROR);
 	i = 1;
 	while (i <= 7)
 	{
 		if (!is_numeric(argv[i]))
-		{
-			fprintf(stderr, "Error: Argument %d must be a positive integer.\n", i);
-			return (ERROR);
-		}
+			return (fprintf(stderr, "Error: Arg %d must be int.\n", i), ERROR);
 		i++;
 	}
 	data->num_coders = (int)ft_atoll_pos(argv[1]);
@@ -99,18 +93,9 @@ int	parse_arguments(int argc, char **argv, t_data *data)
 	data->time_to_refactor = ft_atoll_pos(argv[5]);
 	data->compiles_required = (int)ft_atoll_pos(argv[6]);
 	data->dongle_cooldown = ft_atoll_pos(argv[7]);
-	if (data->num_coders <= 0 || data->time_to_burnout <= 0
-		|| data->time_to_compile <= 0 || data->time_to_debug <= 0
-		|| data->time_to_refactor <= 0 || data->compiles_required < 0
-		|| data->dongle_cooldown < 0)
-	{
-		fprintf(stderr, "Error: Arguments contain values out of valid range.\n");
+	if (validate_ranges(data) != SUCCESS)
 		return (ERROR);
-	}
 	if (parse_scheduler(argv[8], &data->scheduler_type) != SUCCESS)
-	{
-		fprintf(stderr, "Error: Scheduler must be either 'fifo' or 'edf'.\n");
-		return (ERROR);
-	}
+		return (fprintf(stderr, "Error: Scheduler must be fifo/edf.\n"), ERROR);
 	return (SUCCESS);
 }
