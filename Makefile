@@ -15,7 +15,9 @@ SRCS        = $(SRC_DIR)/main.c \
 			$(SRC_DIR)/heap/heap_ops.c \
 			$(SRC_DIR)/heap/heap_utils.c \
 			$(SRC_DIR)/utils/time_utils.c \
-            $(SRC_DIR)/utils/print_status.c
+			$(SRC_DIR)/utils/print_status.c \
+			$(SRC_DIR)/sync/init_sync.c \
+			$(SRC_DIR)/sync/cleanup.c
 
 # Mapeamento de objetos e dependencias
 OBJS        = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
