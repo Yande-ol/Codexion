@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   init_sync.c                                        :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: Yande-ol <Yande-ol@student.42porto.com>    #+#  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2026-09-25 23:24:23 by Yande-ol          #+#    #+#             */
-/*   Updated: 2026-09-25 23:24:23 by Yande-ol         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "codexion.h"
 
 static int	init_dongles(t_data *data)
@@ -18,7 +6,7 @@ static int	init_dongles(t_data *data)
 
 	data->dongles = malloc(sizeof(t_dongle) * data->num_coders);
 	if (!data->dongles)
-		return (0);
+		return (ERROR);
 	i = 0;
 	while (i < data->num_coders)
 	{
@@ -26,15 +14,15 @@ static int	init_dongles(t_data *data)
 		data->dongles[i].is_in_use = 0;
 		data->dongles[i].last_released_time = 0;
 		if (pthread_mutex_init(&data->dongles[i].mutex, NULL) != 0)
-			return (0);
+			return (ERROR);
 		if (pthread_cond_init(&data->dongles[i].cond, NULL) != 0)
-			return (0);
-		if (!heap_init(&data->dongles[i].queue, data->num_coders,
-				data->scheduler_type))
-			return (0);
+			return (ERROR);
+		if (heap_init(&data->dongles[i].queue, data->num_coders,
+				data->scheduler_type) != SUCCESS)
+			return (ERROR);
 		i++;
 	}
-	return (1);
+	return (SUCCESS);
 }
 
 static int	init_coders(t_data *data)
@@ -43,7 +31,7 @@ static int	init_coders(t_data *data)
 
 	data->coders = malloc(sizeof(t_coder) * data->num_coders);
 	if (!data->coders)
-		return (0);
+		return (ERROR);
 	i = 0;
 	while (i < data->num_coders)
 	{
@@ -55,10 +43,10 @@ static int	init_coders(t_data *data)
 		data->coders[i].right_dongle = &data->dongles[(i + 1)
 			% data->num_coders];
 		if (pthread_mutex_init(&data->coders[i].meal_mutex, NULL) != 0)
-			return (0);
+			return (ERROR);
 		i++;
 	}
-	return (1);
+	return (SUCCESS);
 }
 
 int	init_simulation_data(t_data *data)
@@ -68,12 +56,12 @@ int	init_simulation_data(t_data *data)
 	data->dongles = NULL;
 	data->coders = NULL;
 	if (pthread_mutex_init(&data->stop_mutex, NULL) != 0)
-		return (0);
+		return (ERROR);
 	if (pthread_mutex_init(&data->log_mutex, NULL) != 0)
-		return (0);
-	if (!init_dongles(data))
-		return (0);
-	if (!init_coders(data))
-		return (0);
-	return (1);
+		return (ERROR);
+	if (init_dongles(data) != SUCCESS)
+		return (ERROR);
+	if (init_coders(data) != SUCCESS)
+		return (ERROR);
+	return (SUCCESS);
 }
