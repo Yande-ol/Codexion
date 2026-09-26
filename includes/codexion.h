@@ -39,4 +39,8 @@ long long	get_time_in_ms(void);
 void		precise_sleep(long long duration_ms, t_data *data);
 void		print_status(t_coder *coder, const char *status);
 
+/* Sync / Lifecycle */
+int			init_simulation_data(t_data *data);
+void		cleanup_simulation_data(t_data *data);
+
 #endif
