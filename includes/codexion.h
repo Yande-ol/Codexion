@@ -38,9 +38,13 @@ int			heap_peek(t_heap *heap, t_request *out_req);
 long long	get_time_in_ms(void);
 void		precise_sleep(long long duration_ms, t_data *data);
 void		print_status(t_coder *coder, const char *status);
+int			is_simulation_stopped(t_data *data);
+void		set_simulation_stopped(t_data *data);
 
 /* Sync / Lifecycle */
 int			init_simulation_data(t_data *data);
 void		cleanup_simulation_data(t_data *data);
+int			take_dongles(t_coder *coder);
+void		release_dongles(t_coder *coder);
 
 #endif
