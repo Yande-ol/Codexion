@@ -9,7 +9,7 @@ OBJ_DIR     = obj
 INC_DIR     = includes
 
 # Lista de fontes
-SRCS        = $(SRC_DIR)/main.c \
+SRCS        = $(SRC_DIR)/main2.c \
 			$(SRC_DIR)/parsing/parse_args.c \
 			$(SRC_DIR)/heap/heap_init.c \
 			$(SRC_DIR)/heap/heap_ops.c \
@@ -17,7 +17,10 @@ SRCS        = $(SRC_DIR)/main.c \
 			$(SRC_DIR)/utils/time_utils.c \
 			$(SRC_DIR)/utils/print_status.c \
 			$(SRC_DIR)/sync/init_sync.c \
-			$(SRC_DIR)/sync/cleanup.c
+			$(SRC_DIR)/sync/cleanup.c \
+			$(SRC_DIR)/sync/sync_actions.c\
+			$(SRC_DIR)/utils/sim_status.c
+
 
 # Mapeamento de objetos e dependencias
 OBJS        = $(SRCS:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
