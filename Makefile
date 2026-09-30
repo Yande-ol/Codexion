@@ -9,7 +9,7 @@ OBJ_DIR     = obj
 INC_DIR     = includes
 
 # Lista de fontes
-SRCS        = $(SRC_DIR)/main2.c \
+SRCS        = $(SRC_DIR)/main.c \
 			$(SRC_DIR)/parsing/parse_args.c \
 			$(SRC_DIR)/heap/heap_init.c \
 			$(SRC_DIR)/heap/heap_ops.c \
