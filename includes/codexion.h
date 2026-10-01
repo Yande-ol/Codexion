@@ -49,5 +49,9 @@ void		release_dongles(t_coder *coder);
 
 /* Simulation */
 void		*coder_routine(void *arg);
+int			start_simulation(t_data *data);
+
+/* Monitor */
+void		*monitor_routine(void *arg);
 
 #endif
