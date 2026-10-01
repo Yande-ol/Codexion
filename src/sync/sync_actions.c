@@ -28,6 +28,25 @@ static long long	calc_priority(t_coder *coder, t_dongle *dongle)
 	return (priority);
 }
 
+static int	wait_for_dongle(t_coder *coder, t_dongle *dongle)
+{
+	t_request	top;
+
+	while (1)
+	{
+		if (is_simulation_stopped(coder->data))
+		{
+			pthread_mutex_unlock(&dongle->mutex);
+			return (ERROR);
+		}
+		if (!dongle->is_in_use && heap_peek(&dongle->queue, &top) == SUCCESS
+			&& top.coder_id == coder->id)
+			break ;
+		pthread_cond_wait(&dongle->cond, &dongle->mutex);
+	}
+	return (SUCCESS);
+}
+
 static int	take_single_dongle(t_coder *coder, t_dongle *dongle)
 {
 	t_request	req;
@@ -42,18 +61,8 @@ static int	take_single_dongle(t_coder *coder, t_dongle *dongle)
 		pthread_mutex_unlock(&dongle->mutex);
 		return (ERROR);
 	}
-	while (1)
-	{
-		if (is_simulation_stopped(coder->data))
-		{
-			pthread_mutex_unlock(&dongle->mutex);
-			return (ERROR);
-		}
-		if (!dongle->is_in_use && heap_peek(&dongle->queue, &top) == SUCCESS
-			&& top.coder_id == coder->id)
-			break ;
-		pthread_cond_wait(&dongle->cond, &dongle->mutex);
-	}
+	if (wait_for_dongle(coder, dongle) != SUCCESS)
+		return (ERROR);
 	heap_pop(&dongle->queue, &top);
 	dongle->is_in_use = 1;
 	pthread_mutex_unlock(&dongle->mutex);
@@ -90,7 +99,6 @@ void	release_dongles(t_coder *coder)
 	coder->left_dongle->last_released_time = get_time_in_ms();
 	pthread_cond_broadcast(&coder->left_dongle->cond);
 	pthread_mutex_unlock(&coder->left_dongle->mutex);
-
 	pthread_mutex_lock(&coder->right_dongle->mutex);
 	coder->right_dongle->is_in_use = 0;
 	coder->right_dongle->last_released_time = get_time_in_ms();
