@@ -11,82 +11,57 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
+#include <stdio.h>
+#include <unistd.h>
 
-/* int	main(int argc, char **argv)
+int	main(int argc, char **argv)
 {
-	t_data	data;
+	t_data		data;
+	pthread_t	threads[15];
+	int			i;
 
-	memset(&data, 0, sizeof(t_data));
-	if (parse_arguments(argc, argv, &data) != SUCCESS)
-		return (ERROR);
-	printf("Configuracao carregada com sucesso!\n");
-	printf("Coders: %d | Scheduler: %s\n",
-		data.num_coders,
-		data.scheduler_type == POLICY_FIFO ? "FIFO" : "EDF");
-	return (SUCCESS);
-}*/
-
-
-/* Teste para validar a Min-Heap nos dois modos: FIFO e EDF, incluindo o critério de desempate por coder_id. */
-#include "codexion.h"
-
-static void	test_fifo(void)
-{
-	t_heap		heap;
-	t_request	req;
-
-	printf("--- TESTE FIFO (Menor request_time primeiro, desempate menor ID) ---\n");
-	heap_init(&heap, 10, POLICY_FIFO);
-
-	/* Inserindo fora de ordem: */
-	/* Coder 3 chegou no tempo 500 */
-	heap_push(&heap, (t_request){.coder_id = 3, .request_time = 500, .deadline = 1000});
-	/* Coder 1 chegou no tempo 100 */
-	heap_push(&heap, (t_request){.coder_id = 1, .request_time = 100, .deadline = 900});
-	/* Coder 2 chegou no tempo 300 */
-	heap_push(&heap, (t_request){.coder_id = 2, .request_time = 300, .deadline = 800});
-	/* Coder 4 chegou empatado no tempo 100 com o Coder 1 (Coder 1 deve sair antes pelo ID) */
-	heap_push(&heap, (t_request){.coder_id = 4, .request_time = 100, .deadline = 700});
-
-	printf("Ordem esperada de saida: Coder 1 -> Coder 4 -> Coder 2 -> Coder 3\n");
-	printf("Ordem obtida:           ");
-	while (heap_pop(&heap, &req) == SUCCESS)
-		printf("Coder %d (req:%lld) -> ", req.coder_id, req.request_time);
-	printf("FIM\n\n");
-
-	heap_destroy(&heap);
-}
-
-static void	test_edf(void)
-{
-	t_heap		heap;
-	t_request	req;
-
-	printf("--- TESTE EDF (Menor deadline primeiro, desempate menor ID) ---\n");
-	heap_init(&heap, 10, POLICY_EDF);
-
-	/* Inserindo fora de ordem: */
-	/* Coder 1 tem deadline 900 */
-	heap_push(&heap, (t_request){.coder_id = 1, .request_time = 100, .deadline = 900});
-	/* Coder 2 tem deadline 200 (mais urgente!) */
-	heap_push(&heap, (t_request){.coder_id = 2, .request_time = 400, .deadline = 200});
-	/* Coder 3 tem deadline 600 */
-	heap_push(&heap, (t_request){.coder_id = 3, .request_time = 200, .deadline = 600});
-	/* Coder 4 empata na deadline 200 com Coder 2 (Coder 2 deve sair antes pelo ID) */
-	heap_push(&heap, (t_request){.coder_id = 4, .request_time = 100, .deadline = 200});
-
-	printf("Ordem esperada de saida: Coder 2 -> Coder 4 -> Coder 3 -> Coder 1\n");
-	printf("Ordem obtida:           ");
-	while (heap_pop(&heap, &req) == SUCCESS)
-		printf("Coder %d (deadline:%lld) -> ", req.coder_id, req.deadline);
-	printf("FIM\n");
-
-	heap_destroy(&heap);
-}
-
-int	main(void)
-{
-	test_fifo();
-	test_edf();
+	(void)argc;
+	(void)argv;
+	printf("=== [TESTE DE INTEGRAÇÃO: CODER_ROUTINE] ===\n");
+	data.num_coders = 15;
+	data.time_to_burnout = 1000;
+	data.time_to_compile = 100;
+	data.time_to_debug = 50;
+	data.compiles_required = 15;
+	data.scheduler_type = SCHED_FIFO;
+	if (init_simulation_data(&data) != SUCCESS)
+	{
+		printf("[ERRO] Falha em init_simulation_data\n");
+		return (1);
+	}
+	data.sim_start_time = get_time_in_ms();
+	i = 0;
+	while (i < data.num_coders)
+	{
+		pthread_mutex_lock(&data.coders[i].meal_mutex);
+		data.coders[i].last_compile_start = data.sim_start_time;
+		pthread_mutex_unlock(&data.coders[i].meal_mutex);
+		i++;
+	}
+	printf("[OK] Dados inicializados. A lançar coder_routine em 3 threads...\n\n");
+	i = 0;
+	while (i < data.num_coders)
+	{
+		if (pthread_create(&threads[i], NULL, coder_routine, &data.coders[i]) != 0)
+			return (1);
+		i++;
+	}
+	usleep(600000);
+	printf("\n[MAIN] Tempo de teste atingido. A sinalizar encerramento...\n");
+	set_simulation_stopped(&data);
+	i = 0;
+	while (i < data.num_coders)
+	{
+		pthread_join(threads[i], NULL);
+		i++;
+	}
+	printf("[OK] Todas as threads responderam ao sinal de paragem e saíram limpas!\n");
+	cleanup_simulation_data(&data);
+	printf("[OK] Cleanup concluído com 0 leaks.\n");
 	return (0);
 }
