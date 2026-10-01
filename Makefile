@@ -20,7 +20,9 @@ SRCS        = $(SRC_DIR)/main.c \
 			$(SRC_DIR)/sync/cleanup.c \
 			$(SRC_DIR)/sync/sync_actions.c \
 			$(SRC_DIR)/utils/sim_status.c \
-			$(SRC_DIR)/simulation/coder_routine.c
+			$(SRC_DIR)/simulation/coder_routine.c \
+			$(SRC_DIR)/simulation/start_simulation.c \
+			$(SRC_DIR)/monitor/monior_rotine.c
 
 
 # Mapeamento de objetos e dependencias
