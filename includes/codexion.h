@@ -47,4 +47,7 @@ void		cleanup_simulation_data(t_data *data);
 int			take_dongles(t_coder *coder);
 void		release_dongles(t_coder *coder);
 
+/* Simulation */
+void		*coder_routine(void *arg);
+
 #endif
