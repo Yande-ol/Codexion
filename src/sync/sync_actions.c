@@ -17,7 +17,7 @@ static long long	calc_priority(t_coder *coder, t_dongle *dongle)
 	long long	priority;
 
 	(void)dongle;
-	if (coder->data->scheduler_type == SCHED_FIFO)
+	if (coder->data->scheduler_type == POLICY_FIFO)
 		priority = get_time_in_ms();
 	else
 	{
