@@ -50,6 +50,18 @@ static void	join_all_threads(t_data *data, pthread_t *threads,
 	}
 }
 
+static void	join_coder_threads(t_data *data, pthread_t *threads)
+{
+	int	i;
+
+	i = 0;
+	while (i < data->num_coders)
+	{
+		pthread_join(threads[i], NULL);
+		i++;
+	}
+}
+
 int	start_simulation(t_data *data)
 {
 	pthread_t	*threads;
@@ -67,7 +79,7 @@ int	start_simulation(t_data *data)
 	if (pthread_create(&monitor_thread, NULL, monitor_routine, data) != 0)
 	{
 		set_simulation_stopped(data);
-		join_all_threads(data, threads, monitor_thread);
+		join_coder_threads(data, threads);
 		free(threads);
 		return (ERROR);
 	}
