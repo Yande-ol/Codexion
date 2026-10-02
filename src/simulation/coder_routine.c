@@ -6,7 +6,7 @@
 /*   By: Yande-ol <Yande-ol@student.42porto.com>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026-09-30 20:35:43 by Yande-ol          #+#    #+#             */
-/*   Updated: 2026-09-30 20:35:43 by Yande-ol         ###   ########.fr       */
+/*   Updated: 2026-10-02 02:50:00 by Yande-ol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,12 @@ static void	coder_compile(t_coder *coder)
 {
 	pthread_mutex_lock(&coder->meal_mutex);
 	coder->last_compile_start = get_time_in_ms();
-	coder->compiles_count++;
 	pthread_mutex_unlock(&coder->meal_mutex);
 	print_status(coder, "is compiling");
 	precise_sleep(coder->data->time_to_compile, coder->data);
+	pthread_mutex_lock(&coder->meal_mutex);
+	coder->compiles_count++;
+	pthread_mutex_unlock(&coder->meal_mutex);
 }
 
 static int	coder_rest_and_refactor(t_coder *coder)

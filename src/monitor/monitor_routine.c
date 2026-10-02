@@ -6,22 +6,12 @@
 /*   By: Yande-ol <Yande-ol@student.42porto.com>    #+#  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2026-10-01 15:06:00 by Yande-ol          #+#    #+#             */
-/*   Updated: 2026-10-01 15:06:00 by Yande-ol         ###   ########.fr       */
+/*   Updated: 2026-10-02 02:50:00 by Yande-ol         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "codexion.h"
 #include <stdio.h>
-
-/*void	*monitor_routine(void *arg)
-{
-	t_data	*data;
-
-	data = (t_data *)arg;
-	while (!is_simulation_stopped(data))
-		precise_sleep(1, data);
-	return (NULL);
-}*/
 
 static int	check_all_compiled(t_data *data)
 {
@@ -61,7 +51,7 @@ static int	check_coder_burnout(t_data *data, t_coder *coder)
 		pthread_mutex_unlock(&coder->meal_mutex);
 		pthread_mutex_lock(&data->log_mutex);
 		set_simulation_stopped(data);
-		printf("%lld %d has burned out\n",
+		printf("%lld %d burned out\n",
 			now - data->sim_start_time, coder->id);
 		pthread_mutex_unlock(&data->log_mutex);
 		return (1);
