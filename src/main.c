@@ -30,10 +30,7 @@ int	main(int argc, char **argv)
 		return (1);
 	}
 	if (init_simulation_data(&data) != SUCCESS)
-	{
-		cleanup_simulation_data(&data);
 		return (1);
-	}
 	if (start_simulation(&data) != SUCCESS)
 	{
 		cleanup_simulation_data(&data);
