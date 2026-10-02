@@ -11,46 +11,34 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
-#include <stdio.h>
+#include <unistd.h>
+
+static void	print_usage(void)
+{
+	write(2, "Usage: ./codexion <num_coders> <burnout> <compile> <debug> ", 59);
+	write(2, "<refactor> <compiles_req> <cooldown> <fifo|edf>\n", 48);
+}
 
 int	main(int argc, char **argv)
 {
 	t_data	data;
 
-	(void)argc;
-	(void)argv;
-
-	/* --- CENÁRIO 1: TESTE DE BURNOUT COM 1 CODER --- */
-	printf("=== [TESTE 1: 1 CODER - DEVE SOFRER BURNOUT EM ~800ms] ===\n");
-	data.num_coders = 1;
-	data.time_to_burnout = 800;
-	data.time_to_compile = 200;
-	data.time_to_debug = 200;
-	data.compiles_required = 0;
-	data.scheduler_type = SCHED_FIFO;
-
-	if (init_simulation_data(&data) != SUCCESS)
+	memset(&data, 0, sizeof(t_data));
+	if (parse_arguments(argc, argv, &data) != SUCCESS)
+	{
+		print_usage();
 		return (1);
-
-	start_simulation(&data);
-	cleanup_simulation_data(&data);
-	printf("[OK] Teste 1 concluído com sucesso!\n\n");
-
-	/* --- CENÁRIO 2: TESTE DE QUOTA (COMPILES REQUIRED) --- */
-	printf("=== [TESTE 2: 5 CODERS - META DE 3 COMPILAÇÕES] ===\n");
-	data.num_coders = 5;
-	data.time_to_burnout = 800;
-	data.time_to_compile = 100;
-	data.time_to_debug = 50;
-	data.compiles_required = 3;
-	data.scheduler_type = SCHED_FIFO;
-
+	}
 	if (init_simulation_data(&data) != SUCCESS)
+	{
+		cleanup_simulation_data(&data);
 		return (1);
-
-	start_simulation(&data);
+	}
+	if (start_simulation(&data) != SUCCESS)
+	{
+		cleanup_simulation_data(&data);
+		return (1);
+	}
 	cleanup_simulation_data(&data);
-	printf("[OK] Teste 2 concluído: todos bateram a meta e parou limpo!\n");
-
 	return (0);
 }
