@@ -64,7 +64,7 @@ static int	validate_ranges(t_data *data)
 {
 	if (data->num_coders <= 0 || data->time_to_burnout <= 0
 		|| data->time_to_compile <= 0 || data->time_to_debug <= 0
-		|| data->time_to_refactor <= 0 || data->compiles_required < 0
+		|| data->time_to_refactor <= 0 || data->compiles_required <= 0
 		|| data->dongle_cooldown < 0)
 	{
 		fprintf(stderr, "Error: Arguments out of valid range.\n");
