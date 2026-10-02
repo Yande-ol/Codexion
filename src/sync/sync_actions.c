@@ -16,6 +16,7 @@ static long long	calc_priority(t_coder *coder, t_dongle *dongle)
 {
 	long long	priority;
 
+	(void)dongle;
 	if (coder->data->scheduler_type == SCHED_FIFO)
 		priority = get_time_in_ms();
 	else
@@ -24,27 +25,32 @@ static long long	calc_priority(t_coder *coder, t_dongle *dongle)
 		priority = coder->last_compile_start + coder->data->time_to_burnout;
 		pthread_mutex_unlock(&coder->meal_mutex);
 	}
-	(void)dongle;
 	return (priority);
 }
 
 static int	wait_for_dongle(t_coder *coder, t_dongle *dongle)
 {
 	t_request	top;
+	long long	elapsed;
 
-	while (1)
+	while (!is_simulation_stopped(coder->data))
 	{
-		if (is_simulation_stopped(coder->data))
-		{
-			pthread_mutex_unlock(&dongle->mutex);
-			return (ERROR);
-		}
 		if (!dongle->is_in_use && heap_peek(&dongle->queue, &top) == SUCCESS
 			&& top.coder_id == coder->id)
-			break ;
+		{
+			elapsed = get_time_in_ms() - dongle->last_released_time;
+			if (dongle->last_released_time > 0
+				&& elapsed < coder->data->dongle_cooldown)
+				precise_sleep(coder->data->dongle_cooldown - elapsed,
+					coder->data);
+			if (is_simulation_stopped(coder->data))
+				break ;
+			return (SUCCESS);
+		}
 		pthread_cond_wait(&dongle->cond, &dongle->mutex);
 	}
-	return (SUCCESS);
+	pthread_mutex_unlock(&dongle->mutex);
+	return (ERROR);
 }
 
 static int	take_single_dongle(t_coder *coder, t_dongle *dongle)
@@ -75,12 +81,9 @@ int	take_dongles(t_coder *coder)
 	t_dongle	*first;
 	t_dongle	*second;
 
-	if (coder->left_dongle->id < coder->right_dongle->id)
-	{
-		first = coder->left_dongle;
-		second = coder->right_dongle;
-	}
-	else
+	first = coder->left_dongle;
+	second = coder->right_dongle;
+	if (first->id > second->id)
 	{
 		first = coder->right_dongle;
 		second = coder->left_dongle;
@@ -88,7 +91,14 @@ int	take_dongles(t_coder *coder)
 	if (take_single_dongle(coder, first) != SUCCESS)
 		return (ERROR);
 	if (take_single_dongle(coder, second) != SUCCESS)
+	{
+		pthread_mutex_lock(&first->mutex);
+		first->is_in_use = 0;
+		first->last_released_time = get_time_in_ms();
+		pthread_cond_broadcast(&first->cond);
+		pthread_mutex_unlock(&first->mutex);
 		return (ERROR);
+	}
 	return (SUCCESS);
 }
 
