@@ -11,22 +11,7 @@
 /* ************************************************************************** */
 
 #include "codexion.h"
-
-static int	is_numeric(const char *str)
-{
-	int	i;
-
-	if (!str || !str[0])
-		return (0);
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] < '0' || str[i] > '9')
-			return (0);
-		i++;
-	}
-	return (1);
-}
+#include <limits.h>
 
 static long long	ft_atoll_pos(const char *str)
 {
@@ -37,9 +22,11 @@ static long long	ft_atoll_pos(const char *str)
 	i = 0;
 	while (str[i])
 	{
-		res = (res * 10) + (str[i] - '0');
-		if (res < 0)
+		if (str[i] < '0' || str[i] > '9')
 			return (-1);
+		if (res > (LLONG_MAX - (str[i] - '0')) / 10)
+			return (-1);
+		res = (res * 10) + (str[i] - '0');
 		i++;
 	}
 	return (res);
@@ -73,26 +60,41 @@ static int	validate_ranges(t_data *data)
 	return (SUCCESS);
 }
 
-int	parse_arguments(int argc, char **argv, t_data *data)
+static int	parse_values(char **argv, long long *values)
 {
 	int	i;
 
-	if (argc != 9)
-		return (fprintf(stderr, "Error: Invalid number of args.\n"), ERROR);
-	i = 1;
-	while (i <= 7)
+	i = 0;
+	while (i < 7)
 	{
-		if (!is_numeric(argv[i]))
-			return (fprintf(stderr, "Error: Arg %d must be int.\n", i), ERROR);
+		if (!argv[i + 1][0])
+			return (ERROR);
+		values[i] = ft_atoll_pos(argv[i + 1]);
+		if (values[i] < 0)
+			return (ERROR);
 		i++;
 	}
-	data->num_coders = (int)ft_atoll_pos(argv[1]);
-	data->time_to_burnout = ft_atoll_pos(argv[2]);
-	data->time_to_compile = ft_atoll_pos(argv[3]);
-	data->time_to_debug = ft_atoll_pos(argv[4]);
-	data->time_to_refactor = ft_atoll_pos(argv[5]);
-	data->compiles_required = (int)ft_atoll_pos(argv[6]);
-	data->dongle_cooldown = ft_atoll_pos(argv[7]);
+	return (SUCCESS);
+}
+
+int	parse_arguments(int argc, char **argv, t_data *data)
+{
+	long long	parsed_values[7];
+
+	if (argc != 9)
+		return (fprintf(stderr, "Error: Invalid number of args.\n"), ERROR);
+	if (parse_values(argv, parsed_values) != SUCCESS)
+		return (fprintf(stderr, "Error: Invalid numeric argument.\n"), ERROR);
+	if (parsed_values[0] > INT_MAX || parsed_values[5] > INT_MAX)
+		return (fprintf(stderr, "Error: Integer argument out of range.\n"),
+			ERROR);
+	data->num_coders = (int)parsed_values[0];
+	data->time_to_burnout = parsed_values[1];
+	data->time_to_compile = parsed_values[2];
+	data->time_to_debug = parsed_values[3];
+	data->time_to_refactor = parsed_values[4];
+	data->compiles_required = (int)parsed_values[5];
+	data->dongle_cooldown = parsed_values[6];
 	if (validate_ranges(data) != SUCCESS)
 		return (ERROR);
 	if (parse_scheduler(argv[8], &data->scheduler_type) != SUCCESS)
